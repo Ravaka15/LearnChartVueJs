@@ -1,64 +1,75 @@
 <template>
-    <div class="chart-container">
-      <div 
-        v-for="(item, index) in sortedData" 
-        :key="index" 
-        class="bar" 
-        :style="{ width: item.width, backgroundColor: item.color }"
-      >
-        <span class="label">{{ item.label }}: {{ item.value }}</span>
-      </div>
-    </div>
-  </template>
-  
-  <script setup>
-  import { ref, computed } from 'vue';
-  
-  const data = ref([
-    { label: 'Facebook', value: 1880, color: '#00E396' },
-    { label: 'Google', value: 1100, color: '#FEB019' },
-    { label: 'Trip Advisor', value: 990, color: '#008FFB' },
-    { label: 'Booking', value: 880, color: '#00E396' },
-    { label: 'Instagram', value: 740, color: '#775DD0' }
-  ]);
-  
-  const maxValue = computed(() => Math.max(...data.value.map(item => item.value)));
-  
-  const sortedData = computed(() => {
-    return data.value
-      .map(item => ({
-        ...item,
-        width: `${(item.value / maxValue.value) * 100}%`
-      }))
-      .sort((a, b) => b.value - a.value);
-  });
-  </script>
-  
-  <style scoped>
-  .chart-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: 600px;
+  <div>
+    <apexchart type="bar" height="350" :options="chartOptions" :series="series"></apexchart>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import VueApexCharts from 'vue3-apexcharts'
+
+const chartOptions = ref({
+  chart: {
+    id: 'social-media-chart',
+    stacked: true,
+    toolbar: {
+      show: false
+    }
+  },
+  plotOptions: {
+    bar: {
+      horizontal: true,
+      borderRadius: 10,
+      dataLabels: {
+        position: 'center', // Centre les labels
+      }
+    }
+  },
+  dataLabels: {
+    enabled: true,
+    formatter: function (val, opts) {
+      return opts.w.globals.labels[opts.dataPointIndex] + ': ' + val
+    },
+    style: {
+      colors: ['#fff'],
+      fontSize: '16px',
+      fontFamily: 'Helvetica, Arial, sans-serif',
+      fontWeight: 400
+    }
+  },
+  xaxis: {
+    categories: ['Facebook', 'Google+', 'Trip Advisor', 'Booking', 'Instagram'],
+    labels: {
+      show: false // Cache les labels sur l'axe pour éviter la duplication
+    }
+  },
+  yaxis: {
+    labels: {
+      style: {
+        colors: ['#999'],
+        fontSize: '14px'
+      }
+    }
+  },
+  colors: ['#2ecc71', '#3498db', '#9b59b6', '#f1c40f', '#e74c3c'], // Couleurs personnalisées
+  legend: {
+    show: false // Cache la légende
   }
-  
-  .bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 50px;
-    margin: 5px 0;
-    color: #fff;
-    font-size: 16px;
-    font-family: Arial, sans-serif;
-    position: relative;
+})
+
+const series = ref([{
+  data: [1380, 1100, 990, 880, 740]
+}])
+</script>
+
+<script>
+export default {
+  components: {
+    apexchart: VueApexCharts
   }
-  
-  .label {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  </style>
-  
+};
+</script>
+
+<style scoped>
+/* Styles personnalisés pour le graphique */
+</style>
